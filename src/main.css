@@ -452,7 +452,7 @@
     left: 10px;
     transform: translateY(-45%);
     border-radius: 1rem;
-    background-color: var(--background-1-light);
+    background-color: white;
     z-index: 9999;
     box-shadow: var(--box-shadow-elevation-1);
     padding: 1rem 1.5rem;
@@ -462,7 +462,7 @@
     flex-direction: column;
   }
   .page-aside-nav ul li a {
-    color: var(--color-text-1);
+    color: #0d0d0d;
     font-weight: 500;
   }
   .page-aside-nav ul li a:hover {
