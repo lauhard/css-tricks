@@ -4,16 +4,12 @@ export const routes = [
         name: 'Home'
     },
     {   
-        path: 'scroll-timeline',
-        name: 'Scroll Timeline'
+        path: '/experiments',
+        name: 'Experiments'
     },
     {
-        path: 'view-timeline',
-        name: 'View Timeline'
-    },
-    {
-        path: 'animation-range',
-        name: 'Animation Range'
+        path: '/components',
+        name: 'Components'
     }
   
 ];

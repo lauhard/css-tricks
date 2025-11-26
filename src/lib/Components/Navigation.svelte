@@ -31,6 +31,7 @@
 <style>
     nav {
         width: 55%;
+        min-width: 330px;
         left: 50%;
         transform: translate(-50%,0%);
         border-radius: 15px;
@@ -39,7 +40,6 @@
         position: fixed;
         z-index: 999;
         transition: all 0.3s ease-in-out;
-       
         animation-timeline: scroll();
     }
     nav:hover {
