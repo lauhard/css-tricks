@@ -1,24 +1,22 @@
 <script lang="ts">
     import { page } from "$app/state";
+    import Aside from "$lib/Components/Aside.svelte";
 
     const { children } = $props();
+    const routes = [
+        {
+            path: `${page.url.origin}/components/infinite-scroller`,
+            name: "Infinite Scroller",
+        },
+        {
+            path: `${page.url.origin}/components/scroll-progress`,
+            name: "Scroll Progress",
+        },
+    ];
 </script>
 
 <div class="layout components-page-layout">
-    <nav class="page-aside-nav">
-        <ul>
-            <li>
-                <a href="{page.url.origin}/components/infinite-scroller"
-                    >Infinite Scroller</a
-                >
-            </li>
-            <li>
-                <a href="{page.url.origin}/components/scroll-progress"
-                    >Scroll Progress</a
-                >
-            </li>
-        </ul>
-    </nav>
+    <Aside {routes}></Aside>
     <div class="wrapper components-page-wrapper">{@render children()}</div>
 </div>
 

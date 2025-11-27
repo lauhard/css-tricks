@@ -1,24 +1,23 @@
 <script lang="ts">
     import { page } from "$app/state";
+    import Aside from "$lib/Components/Aside.svelte";
 
     const { children } = $props();
+    let routes = [
+        {
+            path: `${page.url.origin}/experiments/hero-animation-1`,
+            name: "hero animation 1",
+        },
+
+        {
+            path: `${page.url.origin}/experiments/view-timeline-1`,
+            name: "view timeline 1",
+        },
+    ];
 </script>
 
 <div class="layout experiments-page-layout">
-    <nav class="page-aside-nav">
-        <ul>
-            <li>
-                <a href="{page.url.origin}/experiments/hero-animation-1"
-                    >Hero animation 1</a
-                >
-            </li>
-            <li>
-                <a href="{page.url.origin}/experiments/view-timeline-1"
-                    >View timeline 1</a
-                >
-            </li>
-        </ul>
-    </nav>
+    <Aside {routes}></Aside>
     <div class="wrapper experiments-page-wrapper">{@render children()}</div>
 </div>
 
