@@ -195,7 +195,7 @@
         transform: translate(-50%, -50%);
         z-index: 100;
         text-align: center;
-        width: 600px;
+        max-width: 600px;
 
         h1,
         p {
