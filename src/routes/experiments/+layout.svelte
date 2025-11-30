@@ -8,7 +8,10 @@
             path: `${page.url.origin}/experiments/hero-animation-1`,
             name: "hero animation 1",
         },
-
+        {
+            path: `${page.url.origin}/experiments/horizontal-scroller-1`,
+            name: "horizontal scroller 1",
+        },
         {
             path: `${page.url.origin}/experiments/view-timeline-1`,
             name: "view timeline 1",
