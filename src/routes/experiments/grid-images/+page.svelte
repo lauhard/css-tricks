@@ -8,6 +8,7 @@
 </script>
 
 <section class="sub-page grid-images">
+    <h1 class="h1">Grid Images</h1>
     <div class="image-grid">
         <div class="image"><img src={p1} alt="dummy image1" /></div>
         <div class="image"><img src={p2} alt="dummy image2" /></div>
@@ -19,28 +20,29 @@
 </section>
 
 <style lang="scss">
+    :root{
+        --image-width:200px;
+        --image-height:calc(var(--image-width * 1.5));
+    }
     .grid-images {
-        margin-top: 10rem;
         width: 800px;
+        margin-top: 1rem;
+        text-align: center;
     }
     .image-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(var(--image-width), 1fr));
         grid-auto-flow: dense;
         row-gap: 1rem;
         column-gap: 1rem;
         place-items: center;
-        // background-color: blue;
-        //border: 1px solid blue;
         .image {
-            // background-color: orange;
-            //border: 1px solid orange;
             display: grid;
             place-items: center;
-            min-width: 200px;
-            max-width: 200px;
-            min-height: 200px;
-            max-height: 300px;
+            min-width:var(--image-width);
+            max-width: var(--image-width);
+            min-height: var(--image-width);
+            max-height: var(--image-height);
             height: max-content;
             width: max-content;
             @media (width < 750px) {
@@ -52,7 +54,6 @@
             img {
                 display: block;
                 object-fit: cover;
-                //object-fit: contain;
                 object-position: center center;
                 max-height: inherit;
                 min-height: inherit;
@@ -70,16 +71,9 @@
                     transform: scale(1.01);
                 }
                 @media (width < 700px) {
-                   //width: 100%;
-                   //height: 100%;
-                   //max-height: 100%;
-                   //max-width: 100%;
                    object-fit: cover;
-                   //background-color: red;
                 }
                 transition: all ease-in-out 200ms;
-                //background-color: red;
-                //border: 1px solid red;
             }
         }
     }

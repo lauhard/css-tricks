@@ -114,8 +114,8 @@
 
 <style lang="scss">
     nav {
-        width: 55%;
-        min-width: 330px;
+        width: 65%;
+        
         left: 50%;
         height: 80px;
         transform: translate(-50%, 0%);
@@ -125,8 +125,12 @@
         position: fixed;
         z-index: 999;
         transition: all 0.3s ease-in-out;
+        @media (width < 700px){
+                width:100%;
+                min-width: 100%;
+        }
         animation-timeline: scroll();
-
+       
         .hover-wrapper {
             bottom: -5px;
             right: -2px;
