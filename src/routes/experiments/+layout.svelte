@@ -16,6 +16,11 @@
             path: `${page.url.origin}/experiments/view-timeline-1`,
             name: "view timeline 1",
         },
+        {
+            path: `${page.url.origin}/experiments/grid-images`,
+            name: "grid image",
+        },
+        
     ];
 </script>
 

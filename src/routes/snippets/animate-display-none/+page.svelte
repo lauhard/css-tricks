@@ -1,0 +1,1 @@
+<h1>Animate display none</h1>

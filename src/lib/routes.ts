@@ -10,6 +10,9 @@ export const routes = [
     {
         path: '/components',
         name: 'Components'
+    },
+    {
+        path: '/snippets',
+        name: 'Snippets'
     }
-  
 ];
