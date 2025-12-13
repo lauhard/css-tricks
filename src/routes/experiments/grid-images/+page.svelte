@@ -1,37 +1,67 @@
 <script lang="ts">
+    import { browser } from "$app/environment";
     import p1 from "$lib/assets/p1.jpg";
     import p2 from "$lib/assets/p2.jpg";
     import p3 from "$lib/assets/p3.jpg";
     import p4 from "$lib/assets/p4.jpg";
     import p5 from "$lib/assets/p5.jpg";
     import p6 from "$lib/assets/p6.jpg";
+    let activeImage = $state(false);
+    let index = $state("-1");
+
+    const expand = (e: MouseEvent) => {
+        let li: HTMLLIElement | null = (e.target as HTMLElement)
+            ?.parentElement as HTMLLIElement;
+        if (li) {
+            index = li.dataset?.index ?? "-1";
+        }
+        activeImage = !activeImage;
+    };
 </script>
 
 <section class="sub-page grid-images">
     <h1 class="h1">Grid Images</h1>
-    <div class="image-grid">
-        <div class="image"><img src={p1} alt="dummy image1" /></div>
-        <div class="image"><img src={p2} alt="dummy image2" /></div>
-        <div class="image"><img src={p3} alt="dummy image3" /></div>
-        <div class="image"><img src={p4} alt="dummy image4" /></div>
-        <div class="image"><img src={p5} alt="dummy image5" /></div>
-        <div class="image"><img src={p6} alt="dummy image6" /></div>
-    </div>
+    <ul class="image-grid">
+        {@render imageCard(p1, "0")}
+        {@render imageCard(p2, "1")}
+        {@render imageCard(p3, "2")}
+        {@render imageCard(p4, "3")}
+        {@render imageCard(p5, "4")}
+        {@render imageCard(p6, "5")}
+    </ul>
 </section>
 
+{#snippet imageCard(src: string, _index:string)}
+    <li
+        onclick={(e)=>{ if((e.target as HTMLElement).classList.contains("big-image") && index == _index) activeImage=false }}
+        class="image"
+        data-index="{_index}"
+        class:big-image={activeImage == true && index == _index}
+    >
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+        <img {src} alt="dummy image1" onclick={expand} />
+    </li>
+{/snippet}
+
 <style lang="scss">
-    :root{
-        --image-width:200px;
-        --image-height:calc(var(--image-width * 1.5));
+    :root {
+        --image-width: 200px;
+        --image-height: calc(var(--image-width * 1.5));
     }
     .grid-images {
         width: 800px;
         margin-top: 1rem;
         text-align: center;
+        overflow: hidden;
     }
     .image-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(var(--image-width), 1fr));
+        grid-template-columns: repeat(
+            auto-fit,
+            minmax(var(--image-width), 1fr)
+        );
+        overflow: hidden;
         grid-auto-flow: dense;
         row-gap: 1rem;
         column-gap: 1rem;
@@ -39,10 +69,10 @@
         .image {
             display: grid;
             place-items: center;
-            min-width:var(--image-width);
+            min-width: var(--image-width);
             max-width: var(--image-width);
             min-height: var(--image-width);
-            max-height: var(--image-height);
+            max-height: calc(var(--image-width) * 1.5);
             height: max-content;
             width: max-content;
             @media (width < 750px) {
@@ -71,9 +101,31 @@
                     transform: scale(1.01);
                 }
                 @media (width < 700px) {
-                   object-fit: cover;
+                    object-fit: cover;
                 }
                 transition: all ease-in-out 200ms;
+            }
+        }
+        .big-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            background-color: hsla(0, 0%, 20%, 0.856);
+            width: 100%;
+            height: 100%;
+            min-height: 100%;
+            max-height: 100%;
+            min-width: 100%;
+            max-width: 100%;
+            img {
+                max-height: 500px;
+                min-height: 200px;
+                max-width: 500px;
+                min-width: 200px;
+                height: 500px;
+                width: auto;
             }
         }
     }
