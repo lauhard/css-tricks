@@ -11,20 +11,37 @@
 
     const expand = (e: MouseEvent) => {
         e.preventDefault();
-        document.startViewTransition(() => {
-            let li: HTMLLIElement | null = (e.target as HTMLElement)
+        let li: HTMLLIElement | null = (e.target as HTMLElement)
             ?.parentElement as HTMLLIElement;
+
+        // Wenn bereits aktiv und gleiches Bild geklickt -> schließen
+        if (activeImage && li?.dataset?.index === index) {
+            document.startViewTransition(() => {
+                activeImage = false;
+            });
+            return;
+        }
+
         if (li) {
             index = li.dataset?.index ?? "-1";
         }
-            activeImage = !activeImage;
+
+        document.startViewTransition(() => {
+            activeImage = true;
         });
     };
 </script>
 
-
-<section class="sub-page grid-images match-element-applied">
-<h1 class="h1">Grid Images</h1>
+<section
+    class="sub-page grid-images match-element-applied"
+    class:image-active={activeImage}
+>
+    <div
+        class="overlay"
+        onclick={() =>
+            document.startViewTransition(() => (activeImage = false))}
+    ></div>
+    <h1 class="h1">Grid Images</h1>
 
     <ul class="image-grid">
         {@render imageCard(p1, "0")}
@@ -38,20 +55,17 @@
 
 {#snippet imageCard(src: string, _index: string)}
     <li
-        onclick={(e) => {
-            if (
-                (e.target as HTMLElement).classList.contains("big-image") &&
-                index == _index
-            )
-                activeImage = false;
-        }}
         class="image"
         data-index={_index}
         class:big-image={activeImage == true && index == _index}
+        class:hidden-image={activeImage == true && index != _index}
+        style="view-transition-name: {activeImage && index != _index
+            ? 'none'
+            : `image-${_index}`}"
     >
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-        <img {src} alt="dummy image1" onclick={expand} />
+        <img {src} alt="dummy image1 ${_index}" onclick={expand} />
     </li>
 {/snippet}
 
@@ -107,7 +121,7 @@
                 transform: scale(1);
                 box-shadow: 1px 3px 5px hsla(0, 2%, 12%, 0.4);
                 border: 1px solid inherit;
-
+                cursor: pointer;
                 &:hover {
                     box-shadow: 1px 3px 7px hsla(0, 2%, 12%, 0.6);
                     transform: scale(1.01);
@@ -118,16 +132,15 @@
             }
         }
         .big-image {
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10;
-            background-color: hsla(0, 0%, 20%, 0.856);
-            min-height: 100%;
-            max-height: 100%;
-            min-width: 100%;
-            overflow: hidden;
+            min-height: auto;
+            max-height: none;
+            min-width: auto;
+            max-width: none;
             img {
                 max-height: 500px;
                 min-height: 200px;
@@ -135,13 +148,32 @@
                 min-width: 200px;
                 height: 500px;
                 width: auto;
+                @media (width < 700px) {
+                    object-fit: cover;
+                    max-width: fit-content;
+                    max-height: fit-content;
+                    width: 90svw;
+                }
             }
         }
     }
-    .match-element-applied li {
-        view-transition-name: match-element;
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: hsla(0, 0%, 20%, 0.856);
+        z-index: 5;
+        cursor: pointer;
+        opacity: 0;
+        pointer-events: none;
     }
-   
-
-   
+    .image-active .overlay {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .hidden-image {
+        opacity: 0.3;
+    }
 </style>
