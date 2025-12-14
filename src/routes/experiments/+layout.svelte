@@ -18,7 +18,7 @@
         },
         {
             path: `${page.url.origin}/experiments/grid-images`,
-            name: "grid image",
+            name: "grid images",
         },
         
     ];

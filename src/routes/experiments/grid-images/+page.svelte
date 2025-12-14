@@ -10,17 +10,22 @@
     let index = $state("-1");
 
     const expand = (e: MouseEvent) => {
-        let li: HTMLLIElement | null = (e.target as HTMLElement)
+        e.preventDefault();
+        document.startViewTransition(() => {
+            let li: HTMLLIElement | null = (e.target as HTMLElement)
             ?.parentElement as HTMLLIElement;
         if (li) {
             index = li.dataset?.index ?? "-1";
         }
-        activeImage = !activeImage;
+            activeImage = !activeImage;
+        });
     };
 </script>
 
-<section class="sub-page grid-images">
-    <h1 class="h1">Grid Images</h1>
+
+<section class="sub-page grid-images match-element-applied">
+<h1 class="h1">Grid Images</h1>
+
     <ul class="image-grid">
         {@render imageCard(p1, "0")}
         {@render imageCard(p2, "1")}
@@ -31,11 +36,17 @@
     </ul>
 </section>
 
-{#snippet imageCard(src: string, _index:string)}
+{#snippet imageCard(src: string, _index: string)}
     <li
-        onclick={(e)=>{ if((e.target as HTMLElement).classList.contains("big-image") && index == _index) activeImage=false }}
+        onclick={(e) => {
+            if (
+                (e.target as HTMLElement).classList.contains("big-image") &&
+                index == _index
+            )
+                activeImage = false;
+        }}
         class="image"
-        data-index="{_index}"
+        data-index={_index}
         class:big-image={activeImage == true && index == _index}
     >
         <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -75,6 +86,7 @@
             max-height: calc(var(--image-width) * 1.5);
             height: max-content;
             width: max-content;
+            z-index: 1;
             @media (width < 750px) {
                 max-width: 100%;
                 width: 100%;
@@ -103,7 +115,6 @@
                 @media (width < 700px) {
                     object-fit: cover;
                 }
-                transition: all ease-in-out 200ms;
             }
         }
         .big-image {
@@ -113,12 +124,10 @@
             transform: translate(-50%, -50%);
             z-index: 10;
             background-color: hsla(0, 0%, 20%, 0.856);
-            width: 100%;
-            height: 100%;
             min-height: 100%;
             max-height: 100%;
             min-width: 100%;
-            max-width: 100%;
+            overflow: hidden;
             img {
                 max-height: 500px;
                 min-height: 200px;
@@ -129,4 +138,10 @@
             }
         }
     }
+    .match-element-applied li {
+        view-transition-name: match-element;
+    }
+   
+
+   
 </style>
