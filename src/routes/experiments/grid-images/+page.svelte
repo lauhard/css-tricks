@@ -1,12 +1,20 @@
 <script lang="ts">
-    import { browser } from "$app/environment";
+    import { afterNavigate, beforeNavigate, onNavigate } from "$app/navigation";
     import p1 from "$lib/assets/p1.jpg";
     import p2 from "$lib/assets/p2.jpg";
     import p3 from "$lib/assets/p3.jpg";
     import p4 from "$lib/assets/p4.jpg";
     import p5 from "$lib/assets/p5.jpg";
     import p6 from "$lib/assets/p6.jpg";
-    import type { KeyEvents } from "lucide-svelte/icons/key";
+
+    function preload(src:string) {
+        return new Promise(function(resolve) {
+            let img = new Image()
+            img.onload = resolve
+            img.src = src
+        })
+    }
+   
     let activeImage = $state(false);
     let index = $state("-1");
 
@@ -28,10 +36,7 @@
         });
 </script>
 
-<section
-    class="sub-page grid-images match-element-applied"
-    class:image-active={activeImage}
->
+<section class="sub-page grid-images" class:image-active={activeImage}>
     <div
         class="overlay"
         role="button"
@@ -42,30 +47,46 @@
     ></div>
     <h1 class="h1">Grid Images</h1>
 
-    <ul class="image-grid">
+    <ul class="image-grid match-element-applied">
         {@render imageCard(p1, "0")}
         {@render imageCard(p2, "1")}
         {@render imageCard(p3, "2")}
         {@render imageCard(p4, "3")}
         {@render imageCard(p5, "4")}
         {@render imageCard(p6, "5")}
+        
+         <!--<li
+            class="image"
+            data-index="6"
+            class:big-image={activeImage == true && index == "6"}
+            class:hidden-image={activeImage == true && index != "6"}
+            style="view-transition-name: {activeImage && index != "6"
+                ? 'none'
+                : `image-${"6"}`}"
+        >
+            <a href="#" role="button" onclick={expand} onkeydown={expand} >
+                {#await preload(p1) then _}
+                    <img src={p1}  alt="Not Rick Astley" loading="lazy">
+                {/await}
+            </a>
+        </li>-->
     </ul>
 </section>
 
 {#snippet imageCard(src: string, _index: string)}
-    <li
-        class="image"
-        data-index={_index}
-        class:big-image={activeImage == true && index == _index}
-        class:hidden-image={activeImage == true && index != _index}
-        style="view-transition-name: {activeImage && index != _index
-            ? 'none'
-            : `image-${_index}`}"
-    >
-        <a href="#" role="button" onclick={expand} onkeydown={expand}>
-            <img {src} alt="dummy image1 ${_index}" />
-        </a>
-    </li>
+        <li
+            class="image"
+            data-index={_index}
+            class:big-image={activeImage == true && index == _index}
+            class:hidden-image={activeImage == true && index != _index}
+            style="view-transition-name: {activeImage && index != _index
+                ? 'none'
+                : `image-${_index}`}"
+        >
+            <a href="#" role="button" onclick={expand} onkeydown={expand}>
+                <img src={src} alt="dummy image1 ${_index}" loading="lazy" />
+            </a>
+        </li>
 {/snippet}
 
 <style lang="scss">
@@ -117,13 +138,16 @@
                 height: inherit;
                 width: inherit;
                 border-radius: 20px;
-                transform: scale(1);
                 box-shadow: 1px 3px 5px hsla(0, 2%, 12%, 0.4);
                 border: 1px solid inherit;
+                backface-visibility: hidden;
+                -webkit-backface-visibility: hidden;
+                will-change: box-shadow;
+                transition: box-shadow 200ms ease-in-out;
 
                 &:hover {
                     box-shadow: 1px 3px 7px hsla(0, 2%, 12%, 0.6);
-                    transform: scale(1.01);
+                    transition: box-shadow 200ms ease-in-out;
                 }
                 @media (width < 700px) {
                     object-fit: cover;
@@ -140,11 +164,11 @@
             max-height: none;
             min-width: auto;
             max-width: none;
-              @media (width < 700px) {
+            @media (width < 700px) {
                 max-width: 100%;
-                width:100%;
+                width: 100%;
                 max-height: auto;
-                height:auto;
+                height: auto;
             }
             a {
                 min-width: auto;
@@ -154,7 +178,7 @@
                 width: auto;
                 height: auto;
             }
-                      
+
             img {
                 max-height: 70svh;
                 min-height: 200px;
@@ -163,9 +187,10 @@
                 height: 100%;
                 width: auto;
                 @media (width < 700px) {
-                    max-width: 90svw;
-                    width: fit-content;
-                    height: 70svh;
+                    max-width: 95svw;
+                    width: 95svw;
+                    height: minmax(70svh, 100%);
+                    min-height: 50svh;
                     max-height: 70svh;
                     width: 100%;
                 }
