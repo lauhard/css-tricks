@@ -89,16 +89,17 @@
         row-gap: 1rem;
         column-gap: 1rem;
         place-items: center;
+
         .image,
         a {
             display: grid;
             place-items: center;
             min-width: var(--image-width);
-            max-width: 100%;
+            max-width: 100%; //var(--image-width)
             min-height: var(--image-width);
-            max-height: calc(var(--image-width) * 1.5);
-            height: fit-content;
-            width: 100%;
+            max-height: 100%;
+            height: fit-content; //max-content
+            width: fit-content; //max-content
             @media (width < 700px) {
                 max-width: 100%;
                 width: 100%;
