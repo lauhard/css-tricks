@@ -6,30 +6,26 @@
     import p4 from "$lib/assets/p4.jpg";
     import p5 from "$lib/assets/p5.jpg";
     import p6 from "$lib/assets/p6.jpg";
+    import type { KeyEvents } from "lucide-svelte/icons/key";
     let activeImage = $state(false);
     let index = $state("-1");
 
-    const expand = (e: MouseEvent) => {
+    const expand = (e: MouseEvent | TouchEvent | KeyboardEvent) => {
         e.preventDefault();
-        let li: HTMLLIElement | null = (e.target as HTMLElement)
-            ?.parentElement as HTMLLIElement;
-
-        // Wenn bereits aktiv und gleiches Bild geklickt -> schließen
-        if (activeImage && li?.dataset?.index === index) {
-            document.startViewTransition(() => {
-                activeImage = false;
-            });
-            return;
-        }
+        let target = e.target as HTMLElement;
+        let li: HTMLLIElement | null = target.closest("li") as HTMLLIElement;
 
         if (li) {
             index = li.dataset?.index ?? "-1";
+            document.startViewTransition(() => {
+                activeImage = !activeImage;
+            });
         }
-
-        document.startViewTransition(() => {
-            activeImage = true;
-        });
     };
+    const closeOverlay = (e: MouseEvent | TouchEvent | KeyboardEvent) =>
+        document.startViewTransition(() => {
+            activeImage = false;
+        });
 </script>
 
 <section
@@ -38,8 +34,11 @@
 >
     <div
         class="overlay"
-        onclick={() =>
-            document.startViewTransition(() => (activeImage = false))}
+        role="button"
+        aria-label="dd"
+        tabindex="0"
+        onclick={closeOverlay}
+        onkeydown={closeOverlay}
     ></div>
     <h1 class="h1">Grid Images</h1>
 
@@ -63,9 +62,9 @@
             ? 'none'
             : `image-${_index}`}"
     >
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-        <img {src} alt="dummy image1 ${_index}" onclick={expand} />
+        <a href="#" role="button" onclick={expand} onkeydown={expand}>
+            <img {src} alt="dummy image1 ${_index}" />
+        </a>
     </li>
 {/snippet}
 
@@ -78,7 +77,6 @@
         width: 800px;
         margin-top: 1rem;
         text-align: center;
-        overflow: hidden;
     }
     .image-grid {
         display: grid;
@@ -91,17 +89,17 @@
         row-gap: 1rem;
         column-gap: 1rem;
         place-items: center;
-        .image {
+        .image,
+        a {
             display: grid;
             place-items: center;
             min-width: var(--image-width);
-            max-width: var(--image-width);
+            max-width: 100%;
             min-height: var(--image-width);
             max-height: calc(var(--image-width) * 1.5);
-            height: max-content;
-            width: max-content;
-            z-index: 1;
-            @media (width < 750px) {
+            height: fit-content;
+            width: 100%;
+            @media (width < 700px) {
                 max-width: 100%;
                 width: 100%;
                 max-height: 100%;
@@ -121,7 +119,7 @@
                 transform: scale(1);
                 box-shadow: 1px 3px 5px hsla(0, 2%, 12%, 0.4);
                 border: 1px solid inherit;
-                cursor: pointer;
+
                 &:hover {
                     box-shadow: 1px 3px 7px hsla(0, 2%, 12%, 0.6);
                     transform: scale(1.01);
@@ -136,23 +134,39 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 10;
+            z-index: 15;
             min-height: auto;
             max-height: none;
             min-width: auto;
             max-width: none;
+              @media (width < 700px) {
+                max-width: 100%;
+                width:100%;
+                max-height: auto;
+                height:auto;
+            }
+            a {
+                min-width: auto;
+                max-width: none;
+                min-height: auto;
+                max-height: none;
+                width: auto;
+                height: auto;
+            }
+                      
             img {
-                max-height: 500px;
+                max-height: 70svh;
                 min-height: 200px;
-                max-width: 500px;
+                max-width: 70svw;
                 min-width: 200px;
-                height: 500px;
+                height: 100%;
                 width: auto;
                 @media (width < 700px) {
-                    object-fit: cover;
-                    max-width: fit-content;
-                    max-height: fit-content;
-                    width: 90svw;
+                    max-width: 90svw;
+                    width: fit-content;
+                    height: 70svh;
+                    max-height: 70svh;
+                    width: 100%;
                 }
             }
         }
@@ -168,6 +182,7 @@
         cursor: pointer;
         opacity: 0;
         pointer-events: none;
+        view-transition-name: none;
     }
     .image-active .overlay {
         opacity: 1;
@@ -175,5 +190,6 @@
     }
     .hidden-image {
         opacity: 0.3;
+        view-transition-name: none;
     }
 </style>
