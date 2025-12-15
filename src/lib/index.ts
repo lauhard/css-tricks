@@ -6,7 +6,7 @@ export const preload = async (src:string):Promise<HTMLImageElement | null> => {
         if(browser) {
             let img = new Image();
             img.src = src; 
-            img.onload = () => {resolve(img); console.log("image loaded", img.width, img.height)};
+            img.onload = () => {resolve(img)};
             img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
         } else {
             // On server-side, resolve with null to avoid pending state

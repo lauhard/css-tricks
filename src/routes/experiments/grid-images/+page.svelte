@@ -23,16 +23,6 @@
     };
 
     let innerWidth = $state(0);
-    $effect(() => {
-        innerWidth;
-        console.log("effect: innerWidth", innerWidth);
-    });
-    onNavigate(() => {
-        console.log("onNavigate: innerWidth", innerWidth);
-    });
-    onMount(() => {
-        console.log("onMount: innerWidth", innerWidth);
-    });
 
     let activeImage = $state(false);
     let index = $state("-1");
@@ -127,6 +117,7 @@
                             alt="place-holder"
                             style:with="{args.width}px"
                             style:height="{args.height}px"
+                            loading="eager"
                         />
                     {/if}
                 {/snippet}
@@ -137,7 +128,7 @@
                         height={args.height}
                         src={img.src}
                         alt="dummy image1 ${args.index}"
-                        loading="lazy"
+                        loading="eager"
                     />
                 {/if}
             </svelte:boundary>
