@@ -1,0 +1,248 @@
+.blog-post {
+    width: 100%;
+
+    /* Improvement:
+     --text-1 existiert bei dir nicht. Ich mappe auf den normalen Text-Token. */
+    p {
+        color: var(--color-ld-black-500);
+    }
+
+    /* was: margin-top: 2.5rem; -> tokenisiert */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin-top: var(--space-10);
+        /* 40px */
+    }
+
+    img {
+        width: 100%;
+        max-inline-size: 100%;
+        max-block-size: 100%;
+        height: auto;
+        object-fit: contain;
+        object-position: center;
+        box-sizing: border-box;
+
+        /* was: border-radius: 10px; -> tokenisiert */
+        border-radius: var(--radius-card);
+
+        /* was: box-shadow:--shadow-md; -> fixed */
+        box-shadow: var(--shadow-md);
+
+        /* was: margin-top/bottom: 2rem; -> tokenisiert */
+        margin-block: var(--space-8);
+    }
+
+    .codesandbox,
+    .video,
+    .website {
+        width: 100%;
+        max-inline-size: 100%;
+        align-self: center;
+        height: 600px;
+        box-sizing: border-box;
+
+        /* was: var(--size-*) -> replaced with our spacing/radius tokens */
+        margin-bottom: var(--space-6);
+
+        /* duplicated radius removed */
+        border-radius: var(--radius-card);
+
+        /* was: var(--shadow-5) -> map to your defined tokens */
+        box-shadow: var(--shadow-md);
+
+        /* was: var(--animation-time) -> map to your transitions */
+        transition: all var(--transition-base) ease-in-out;
+
+        /* Optional improvement:
+       Iframes/videos often need overflow hidden for rounded corners to actually clip. */
+        overflow: hidden;
+        background: var(--surface-2);
+        border: var(--border-default);
+    }
+
+    /* Blog lists should look like lists.
+     Your global reset kills list-style; restore it inside blog-post.
+     (If you intentionally want no bullets, remove these 2 blocks.) */
+    ul,
+    ol {
+        padding-inline-start: var(--space-6);
+        margin-bottom: var(--space-6);
+    }
+
+    li {
+        list-style: revert;
+        margin-bottom: var(--space-2);
+    }
+
+    .copy-button-wrapper {
+        /* was: --border-radius: var(--size-2) var(--size-2) 0 0; */
+        --border-radius: var(--radius-5) var(--radius-5) 0 0;
+        --border-radius-label: var(--radius-2);
+
+        position: relative;
+        margin: 0;
+        padding: var(--space-2);
+
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: space-between;
+        align-self: center;
+
+        width: 100%;
+        max-inline-size: 100%;
+
+        border-radius: var(--border-radius);
+
+        /* was: border-top/left/right with !important + surface tokens not defined in our system */
+        border-top: var(--border-default);
+        border-left: var(--border-default);
+        border-right: var(--border-default);
+
+        /* background was shiki */
+        background-color: var(--shiki-bg, var(--color-ld-white-500));
+        box-sizing: border-box;
+
+        transition: background-color var(--transition-base) ease,
+            border-color var(--transition-base) ease;
+
+        .language-description {
+            margin: 0;
+            display: inline-flex;
+            align-items: center;
+            align-self: center;
+            text-align: center;
+
+            /* was: padding-inline var(--size-1); padding-block 1px; margin-left 5px */
+            padding-inline: var(--space-2);
+            padding-block: 1px;
+            margin-left: var(--space-1);
+
+            /* was: background-color: var(--primary); -> map to accent token */
+            background-color: var(--color-ld-accent-600);
+
+            /* was: font-weight: var(--font-weight-7); -> not defined; choose a stable weight */
+            font-weight: 500;
+
+            font-size: 0.8rem;
+            line-height: 0.9rem;
+            height: 1.2rem;
+
+            text-transform: uppercase;
+
+            border-radius: var(--border-radius-label);
+
+            /* was: color: var(--shiki-bg); -> usually label text should contrast the label bg */
+            color: var(--color-ld-white-300);
+        }
+
+        .copy-button {
+            /* tokenized spacing */
+            margin: 0;
+
+            background-color: transparent;
+            border: none;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 50px;
+            cursor: pointer;
+
+            /* keep consistent with controls */
+            border-radius: var(--radius-control);
+
+            outline: none;
+            box-shadow: none;
+
+            transition: transform var(--transition-base) ease,
+                box-shadow var(--transition-base) ease;
+
+            &:active {
+                transform: translateY(1px);
+            }
+
+            &:focus-visible {
+                box-shadow: var(--shadow-focus);
+            }
+
+            svg {
+                display: block;
+
+                fill: transparent;
+
+                /* was: stroke: var(--primary); -> map to accent */
+                stroke: var(--color-ld-accent-500);
+                stroke-width: 2px;
+
+                height: 1.5rem;
+                width: 1.5rem;
+
+                margin: 0;
+                padding: 0;
+
+                /* Only apply if you really need it for shiki contrast */
+                background-color: transparent;
+
+                transition: stroke var(--transition-base) ease;
+            }
+
+            &:hover svg {
+                /* was: stroke var(--surface-1); then overwritten by var(--accent) -> now single source */
+                stroke: var(--color-ld-accent-600);
+            }
+
+            /* If you want icons to blend into the shiki header background explicitly: */
+            .shiki & svg {
+                background-color: var(--shiki-bg, transparent);
+            }
+        }
+    }
+
+    /* Shiki code block */
+    .shiki {
+        width: 100%;
+        max-inline-size: 100%;
+        align-self: center;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+
+        /* was: border-radius: 0 0 var(--size-2) ... -> now with radius token */
+        border-radius: 0 0 var(--radius-5) var(--radius-5);
+        overflow: hidden;
+
+        /* was: var(--shadow-5) -> map */
+        box-shadow: var(--shadow-md);
+
+        /* was: explicit borders with color -> use border tokens */
+        border-left: var(--border-default);
+        border-right: var(--border-default);
+        border-bottom: var(--border-default);
+
+        font-size: 0.9rem;
+        transition: all var(--transition-base) ease-in-out;
+
+        code {
+            width: 100%;
+            max-width: 100%;
+            max-inline-size: 100%;
+            overflow-x: auto;
+            display: block;
+            transition: all var(--transition-base) ease-in-out;
+            margin: 0;
+            padding: 0;
+            padding-inline-start: var(--space-4);
+            padding-bottom: var(--space-3);
+            background-color: var(--color-ld-white-500);
+        }
+    }
+}
+
+.markdown-image.hero-image {
+    /* for the blog hero image */
+}

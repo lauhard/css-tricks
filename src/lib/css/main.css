@@ -1,0 +1,726 @@
+@import url('$lib/css/fonts/satoshi.css');
+@import url('$lib/css/fonts/zodiak.css');
+@import url('$lib/css/fonts/alpino.css');
+
+@layer reset, base, base-layout, components, blog, utils;
+@import url('$lib/css/blog.css') layer(blog);
+@import url('$lib/css/component.css') layer(components);
+
+@layer reset {
+
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+
+    html {
+        scroll-behavior: smooth;
+        scrollbar-gutter: stable;
+        scrollbar-width: thin;
+        scroll-behavior: smooth;
+        -moz-text-size-adjust: auto;
+        -ms-text-size-adjust: auto;
+        -webkit-text-size-adjust: auto;
+        text-size-adjust: auto;
+    }
+
+    html,
+    body {
+        padding: 0;
+        margin: 0;
+    }
+
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    p,
+    figure,
+    blockquote,
+    dl,
+    dd,
+    ul,
+    ol,
+    li,
+    a,
+    img,
+    button,
+    input,
+    textarea {
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        line-height: 1.75;
+    }
+
+    h1,
+    h2,
+    h3,
+    button,
+    input,
+    label {
+        line-height: 1.15;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        text-wrap: balance;
+    }
+
+    input,
+    button,
+    textarea,
+    select {
+        font: inherit;
+    }
+
+
+
+    p {
+        text-wrap: pretty;
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    li {
+        list-style: none;
+    }
+
+    img,
+    picture {
+        max-inline-size: 100%;
+        display: block;
+    }
+}
+
+@layer base {
+    :root {
+        /******************** DESIGN TOKENS ********************/
+
+        /* -------------------------------------------------------
+           SPACING SCALE
+           - 4px base (0.25rem) -> konsistent für padding/margin/gap
+           - "space-7,9,11..." absichtlich ausgelassen (keep it simple)
+           ------------------------------------------------------- */
+        --space-0: 0;
+        --space-1: 0.25rem;
+        /* 4px */
+        --space-2: 0.5rem;
+        /* 8px */
+        --space-3: 0.75rem;
+        /* 12px */
+        --space-4: 1rem;
+        /* 16px */
+        --space-5: 1.25rem;
+        /* 20px */
+        --space-6: 1.5rem;
+        /* 24px */
+        --space-8: 2rem;
+        /* 32px */
+        --space-10: 2.5rem;
+        /* 40px */
+        --space-12: 3rem;
+        /* 48px */
+        --space-16: 4rem;
+        /* 64px */
+
+        /* Improvement:
+           Wenn du später konsistente "component paddings" willst:
+           --pad-control, --pad-card, --pad-section als Alias-Tokens. */
+        --pad-control-y: var(--space-2);
+        --pad-control-x: var(--space-3);
+        --pad-card: var(--space-6);
+        --pad-section: var(--space-10);
+
+        /******************** COMPONENT TOKENS ********************/
+
+        /* BORDER (width + style + default colors) */
+        --border-width-0: 0;
+        --border-width-1: 1px;
+        --border-width-2: 2px;
+
+        --border-style: solid;
+
+        /* neutrals */
+        --border-color: var(--color-ld-white-500);
+        --border-color-strong: var(--color-ld-black-500);
+
+        /* interactive */
+        --border-color-focus: var(--color-ld-accent-500);
+
+        /* Improvement:
+           Statt überall "1px solid ..." zu schreiben, nutze Aliases: */
+        --border-default: var(--border-width-1) var(--border-style) var(--border-color);
+        --border-strong: var(--border-width-1) var(--border-style) var(--border-color-strong);
+        --border-focus: var(--border-width-2) var(--border-style) var(--border-color-focus);
+
+        /* BORDER RADIUS SCALE */
+        --radius-0: 0;
+        --radius-1: 0.125rem;
+        /* 2px */
+        --radius-2: 0.25rem;
+        /* 4px */
+        --radius-3: 0.375rem;
+        /* 6px */
+        --radius-4: 0.5rem;
+        /* 8px */
+        --radius-5: 0.75rem;
+        /* 12px */
+        --radius-6: 1rem;
+        /* 16px */
+        --radius-pill: 9999px;
+
+        /* Component Aliases */
+        --radius-control: var(--radius-2);
+        --radius-button: var(--radius-3);
+        --radius-card: var(--radius-5);
+        --radius-modal: var(--radius-6);
+
+        /* Z-INDEX SCALE (simple + predictable) */
+        --z-base: 0;
+        --z-sticky: 10;
+        --z-dropdown: 20;
+        --z-overlay: 30;
+        --z-modal: 40;
+        --z-toast: 50;
+        --z-tooltip: 60;
+
+        /* Optional: surfaces (helps later for cards/modals) */
+        --surface-1: var(--color-ld-white-300);
+        /* page */
+        --surface-2: var(--color-ld-white-400);
+        /* card */
+        --surface-3: var(--color-ld-white-500);
+
+
+        /******************** COLORS ***************************/
+
+        --color-black-700: #565656;
+        --color-black-600: #4e4e4e;
+        --color-black-500: #3b3b3b;
+        --color-black-400: #1a1a1a;
+        --color-black-300: #0d0d0d;
+
+        --color-white-700: #a49d9d;
+        --color-white-600: #d3cece;
+        --color-white-500: #d4d4d4;
+        --color-white-400: #e5e5e5;
+        --color-white-300: #f2f2f2;
+
+        --color-orange-300: #ffa15e;
+        --color-orange-400: #ffa15e;
+        --color-orange-500: #ffa15e;
+        --color-orange-600: #ffa15e;
+        --color-orange-700: #d05d0c;
+
+        --color-aquamarine-300: #4dd0c8;
+        --color-aquamarine-400: #39bfb6;
+        --color-aquamarine-500: #22a28d;
+        --color-aquamarine-600: #208a81;
+        --color-aquamarine-700: #176160;
+
+        --color-red-300: #f53f3f;
+        --color-red-400: #fc2111;
+        --color-red-500: #ff0000;
+        --color-red-600: #e81111;
+        --color-red-700: #b91212;
+
+
+        color-scheme: light dark;
+        --color-ld-white-300: light-dark(var(--color-white-300), var(--color-black-300));
+        --color-ld-white-400: light-dark(var(--color-white-400), var(--color-black-400));
+        --color-ld-white-500: light-dark(var(--color-white-500), var(--color-black-500));
+        --color-ld-white-600: light-dark(var(--color-white-600), var(--color-black-600));
+        --color-ld-white-700: light-dark(var(--color-white-700), var(--color-black-700));
+
+        --color-ld-black-300: light-dark(var(--color-black-300), var(--color-white-300));
+        --color-ld-black-400: light-dark(var(--color-black-400), var(--color-white-400));
+        --color-ld-black-500: light-dark(var(--color-black-500), var(--color-white-500));
+        --color-ld-black-600: light-dark(var(--color-black-600), var(--color-white-600));
+        --color-ld-black-700: light-dark(var(--color-black-700), var(--color-white-700));
+
+        --color-ld-white-invert-500: light-dark(var(--color-black-500), var(--color-white-500));
+
+        --color-ld-accent-300: light-dark(var(--color-aquamarine-300), var(--color-orange-300));
+        --color-ld-accent-400: light-dark(var(--color-aquamarine-400), var(--color-orange-400));
+        --color-ld-accent-500: light-dark(var(--color-aquamarine-500), var(--color-orange-500));
+        --color-ld-accent-600: light-dark(var(--color-aquamarine-600), var(--color-orange-600));
+        --color-ld-accent-700: light-dark(var(--color-aquamarine-700), var(--color-orange-700));
+
+        --color-ld-accent-500-hover: var(--color-ld-accent-600);
+        --color-ld-accent-600-hover: var(--color-ld-accent-700);
+
+        --color-alert-danger: var(--color-red-300);
+
+        /************************** SHIKI ****************************/
+        --shiki-bg: var(--color-ld-white-500);
+
+
+
+
+        /************************ TRANSITIONS ************************/
+
+        --transition-fast: 100ms;
+        --transition-base: 200ms;
+        --transition-slow: 350ms;
+
+        /*************************** SHADOWS *************************/
+        /* Improvement:
+           - Current shadows are ok, aber du willst meist "layered" shadows
+             (1 soft ambient + 1 directional) -> wirkt hochwertiger.
+           - Außerdem: ein Fokus-Ring Token, statt box-shadow falsch zu setzen. */
+
+        --shadow-none: none;
+
+        /* subtle: buttons, inputs */
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+
+        /* default: cards */
+        --shadow-md: 0 1px 2px rgba(0, 0, 0, 0.08),
+            0 8px 18px rgba(0, 0, 0, 0.10);
+
+        /* elevated: modals / popovers */
+        --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.10),
+            0 20px 40px rgba(0, 0, 0, 0.14);
+
+        /* focus ring (replaces the incorrect "box-shadow: color" usage below) */
+        --shadow-focus: 0 0 0 3px rgba(34, 162, 141, 0.35);
+
+        /******************** TYPOGRAPHY & LAYOUT ********************/
+        --base-font-size: 1rem;
+        --scale: 1.25;
+
+        --h5: calc(var(--base-font-size) * var(--scale));
+        --h4: calc(var(--h5) * var(--scale));
+        --h3: calc(var(--h4) * var(--scale));
+        --h2: calc(var(--h3) * var(--scale));
+        --h1: calc(var(--h2) * var(--scale));
+        --p: calc(var(--base-font-size) * var(--scale));
+
+        --font-family: 'Satoshi',
+            'Alpino-Black',
+            'Segoe UI',
+            'Zodiak',
+            Tahoma,
+            Geneva,
+            Verdana,
+            sans-serif,
+            serif;
+        --serif: 'Zodiak',
+            serif;
+        --san-serif: 'Satoshi',
+            sans-serif;
+
+
+        /************************ LAYOUT SIZES ********************/
+        --content-width-blog: 800px;
+        --content-width: 1280px;
+        --side: 2rem;
+    }
+
+
+
+
+    body {
+        background-color: var(--color-ld-white-300);
+        color: var(--color-ld-black-500);
+        font-family: var(--font-family);
+        font-size: var(--base-font-size);
+        font-weight: 400;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        font-family: var(--serif);
+
+        /* Improvement:
+           `font-weight: true;` ist invalid CSS und wird ignoriert.
+           Setze stattdessen z.B. 600 oder 700.
+        */
+        font-weight: 700;
+    }
+
+    h1,
+    .text-size-h1 {
+        font-weight: 700;
+        font-size: var(--h1);
+        margin-block: 0.67em;
+    }
+
+    h2,
+    .text-size-h2 {
+        font-size: var(--h2);
+        margin-block: 0.83em;
+    }
+
+    h3,
+    .text-size-h3 {
+        font-size: var(--h3);
+        margin-block: 1em;
+    }
+
+    h4,
+    .text-size-h4 {
+        font-size: var(--h4);
+        margin-block: 1.33em;
+    }
+
+    h5,
+    .text-size-h5 {
+        font-size: var(--h5);
+        margin-block: 1.67em;
+    }
+
+    .text-caption {
+        font-size: var(--h5);
+    }
+
+    small,
+    .text-small {
+        font-size: calc(var(--base-font-size) / var(--scale))
+    }
+
+    p {
+        font-size: var(--p);
+
+        /* Improvement:
+           Du kannst margin-bottom über Spacing-Tokens steuern,
+           damit Typografie und Layout konsistent sind.
+           2em ist ok, aber "tokenisiert" ist wartbarer.
+        */
+        margin-bottom: var(--space-8);
+    }
+
+    a {
+        color: var(--color-ld-black-500);
+        font-size: var(--base-font-size);
+        font-family: 'Satoshi';
+        font-weight: 500;
+
+        &:hover {
+            text-decoration: underline;
+            color: var(--color-ld-accent-500);
+        }
+    }
+
+    button {
+        border: none;
+    }
+
+    .btn {
+        display: block;
+        background-color: transparent;
+
+        /* was: padding: .8rem 1.2rem; -> jetzt tokenisiert */
+        padding: var(--pad-control-y) var(--pad-control-x);
+
+        font-size: var(--base-font-size);
+        color: var(--color-ld-black-500);
+        border: 1px solid var(--color-ld-black-500);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all var(--transition-base) ease;
+        text-align: center;
+
+        /* optional: kleine default elevation */
+        box-shadow: var(--shadow-none);
+
+        &:hover,
+        &:active,
+        &:focus {
+            transition: all var(--transition-base) ease;
+            border-color:var(--color-ld-accent-500);
+            color:var(--color-ld-accent-500);
+            text-decoration: none;
+        }
+
+        /* optional: hover elevation */
+        &:hover {
+            box-shadow: var(--shadow-sm);
+        }
+
+        &:focus-visible {
+            outline: none;
+            box-shadow: var(--shadow-focus);
+        }
+        &:disabled{
+            background-color: #dcdcdc2c;
+            text-decoration: line-through;
+            border-color: #dcdcdc97;
+            color: var(--color-ld-black-500);
+        }
+    }
+
+    button,
+    nav a {
+        white-space: nowrap;
+    }
+
+    input,
+    textarea {
+        font-family: var(--font-family);
+        font-size: var(--base-font-size);
+
+        /* was: padding: 0.5rem; -> jetzt tokenisiert */
+        padding: var(--pad-control-y) var(--pad-control-x);
+
+        border: 1px solid var(--color-ld-white-500);
+        border-radius: 4px;
+        width: 100%;
+        box-sizing: border-box;
+        outline: none;
+
+        /* was: margin-bottom: 1rem; -> tokenisiert */
+        margin-bottom: var(--space-4);
+
+        box-shadow: none;
+        transition: all var(--transition-base) ease;
+        background-color: inherit;
+
+        &:focus,
+        &:hover,
+        &:active {
+            border: 1px solid var(--color-ld-accent-500);
+
+            /* Improvement:
+               `box-shadow: var(--color-ld-accent-500);` ist invalid.
+               Box-shadow erwartet offsets/blur/spread.
+               -> Nutze Fokus-Token.
+            */
+            box-shadow: var(--shadow-focus);
+
+            transition: all var(--transition-base) ease;
+        }
+    }
+
+    input::placeholder {
+        color: var(--color-ld-black-500);
+    }
+
+    input[type="checkbox"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: auto;
+        font-size: 1.5em;
+        margin: 0;
+        padding: 2px;
+        outline: none;
+        cursor: pointer;
+        border-radius: 5px;
+        box-shadow: none;
+        margin-right: var(--space-2);
+        border-color: var(--color-ld-black-500);
+
+        &:hover,
+        &:focus,
+        &:active {
+            border-color: var(--color-ld-accent-500);
+
+            /* Improvement: gleiche Story -> focus token */
+            box-shadow: var(--shadow-focus);
+
+            transition: all var(--transition-base) ease-in-out;
+        }
+    }
+
+    input:checked {
+        color: var(--color-ld-accent-500);
+        border-color: var(--color-ld-accent-500);
+    }
+
+    [type="checkbox"]::before {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        content: "";
+        z-index: 5;
+        position: relative;
+        font-size: inherit
+    }
+
+    [type="checkbox"]:checked::before {
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        content: "✔";
+        color: var(--color-ld-accent-500);
+        z-index: 5;
+        position: relative;
+    }
+
+    label[data-type="checkbox"] {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        position: relative;
+
+        /* Improvement:
+           Das hier war doppelt/konflikt: padding-left + danach padding:0.
+           -> Entfernt. Wenn du padding brauchst, nutz Token.
+        */
+        user-select: none;
+        transition: all var(--transition-base) ease-in-out;
+        width: fit-content;
+        margin: 0;
+        padding: 0;
+
+        &:has(input[type="checkbox"]:checked),
+        &:has(input[type="checkbox"]:focus) {
+            color: var(--color-ld-accent-500);
+        }
+
+        &:hover,
+        &:active,
+        &:focus {
+            color: var(--color-ld-accent-500);
+            transition: all var(--transition-base) ease-in-out;
+        }
+    }
+}
+
+@layer base-layout {
+    :root {
+        --header-height: 80px;
+        --side: 2rem;
+        --content-width: 900px;
+    }
+
+    body {
+        width: 100%;
+        height: 100%;
+    }
+
+    .app {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        min-height: 100svh;
+
+        /* Improvement: `min-width: nax-content;` ist ein Tippfehler -> invalid.
+           Vermutlich war `max-content` gemeint. Aber min-width: max-content kann Layout sprengen.
+           Ich lasse es hier bewusst weg. Wenn du was willst: `min-width: 0;` für Flex-Children. */
+        width: 100%;
+        height: 100%;
+    }
+
+    main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+@layer utils {
+
+    .alert,
+    .alert-danger {
+        color: var(--color-alert-danger);
+        text-align: left;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: .8rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-login,
+    .btn-logout,
+    .btn-signup,
+    .btn:has(.btn-signup),
+    .btn:has(.btn-logout),
+    .btn:has(.btn-login) {
+
+        font-weight: bold;
+        border: 1px solid var(--color-ld-accent-600);
+        background-color: var(--color-ld-accent-600);
+        color: var(--color-ld-white-300);
+
+        &:hover {
+            background-color: var(--color-ld-accent-500);
+            border-color: var(--color-ld-accent-500);
+        }
+    }
+
+    .btn:has(.btn-signup),
+    .btn-signup {
+        background-color: var(--color-ld-accent-700);
+        border: 1px solid var(--color-ld-accent-700);
+
+        &:hover {
+            background-color: var(--color-ld-accent-600);
+            border-color: var(--color-ld-accent-700);
+            color: var(--color-ld-white-500);
+        }
+    }
+
+    .btn:has(.btn-logout),
+    .btn-logout {
+        background-color: transparent;
+        border-color: var(--color-red-700);
+        color: var(--color-red-700);
+
+        &:hover {
+            background-color: var(--color-red-700);
+            border-color: var(--color-red-700);
+            color: var(--color-white-500);
+        }
+    }
+
+    .btn:has(svg) {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        svg {
+            margin-inline: var(--space-2);
+        }
+    }
+
+    a:has(svg) {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        svg {
+            margin-inline: var(--space-2);
+        }
+    }
+}
+
+@layer components {}
+
+@layer blog{}
+
+@media (width < 760px) {
+    :root {
+        --scale: 1.15;
+
+    }
+}
+
+@media (width < 600px) {
+    :root {
+        --side: 1rem;
+    }
+}
