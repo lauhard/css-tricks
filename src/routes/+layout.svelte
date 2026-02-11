@@ -1,9 +1,11 @@
 <script lang="ts">
 	import "$lib/css/main.css";
+	import "$lib/css/component.css";
 	import favicon from "$lib/assets/favicon.svg";
 	import { routes } from "$lib/routes";
 	import { LucideMenu } from "lucide-svelte";
 	import ThemeToggle from "$lib/components/ThemeToggle.svelte";
+    import Navigation from "$lib/components/Navigation.svelte";
 	let { children } = $props();
 </script>
 
@@ -19,6 +21,7 @@
 			</div>
 			<button class="btn menu">Menu</button>
 		</header>
+		<Navigation className="main-nav" routes={routes}></Navigation>
 		{@render children()}
 	</main>
 </div>
@@ -29,8 +32,8 @@
 			position: relative;
 			display: flex;
 			justify-content: space-between;
-			.theme-toggle{
-				margin-top:10px;
+			.theme-toggle {
+				margin-top: 10px;
 			}
 			.menu {
 				display: flex;
@@ -42,5 +45,6 @@
 				text-transform: uppercase;
 			}
 		}
+		
 	}
 </style>

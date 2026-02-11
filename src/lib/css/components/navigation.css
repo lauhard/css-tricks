@@ -1,0 +1,14 @@
+.main-nav {
+    display: flex;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    justify-content: center;
+
+    ul {
+        display: flex;
+        flex-direction: row;
+        justify-self: center;
+        align-self: center;
+        gap: 1rem;
+    }
+}
