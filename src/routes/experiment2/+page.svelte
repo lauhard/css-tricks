@@ -1,5 +1,12 @@
 <script lang="ts">
-    import { useGsap, type GsapOptions, GSDevTools } from "$lib/gsap.svelte";
+    import {
+        useGsap,
+        type GsapOptions,
+        GSDevTools,
+        type Tween,
+        type Split,
+        type Timeline,
+    } from "$lib/gsap.svelte";
     let {
         splitText,
         tween,
@@ -8,52 +15,54 @@
         pause,
         restart,
         animationStore,
-        timelineStore,
         unregisterAnimation,
     } = useGsap();
 
     let animations = $derived(animationStore());
-    let timelines = $derived(timelineStore());
 
     $effect(() => {
-        $inspect(animations);
-        if (timelines["timeline1"]) {
-            GSDevTools.create({
-                animation: timelines["timeline1"].timeline,
+        let id = null;
+        if (animations["first-tween"]) {
+            id = GSDevTools.create({
+                animation: animations["first-tween"].timeline,
             });
+            console.log("gs", id);
         }
+        return () => {
+            id?.kill();
+        };
     });
 
-    const splitTextConfig: GsapOptions = {
-        split: {
-            target: ".title",
-            targetType: "chars",
-            vars: {
-                type: "words, chars",
-                wordsClass: "word++",
-                charsClass: "char",
-                mask: "chars",
-            },
+    const splitTextConfig: Split = {
+        targetType: "chars",
+        vars: {
+            type: "words, chars",
+            wordsClass: "word++",
+            charsClass: "char",
+            mask: "chars",
+            deepSlice: false,
         },
     };
-    const tweenConfig1: GsapOptions = {
-        timeline: {
+
+    const tweenFromStagger = (targets = "", name = ""): Tween => {
+        return {
+            name: name,
+            targets: targets,
+            from: {
+                y: "100%",
+                duration: 0.5,
+                stagger: 0.07,
+                ease: "circ.out",
+            },
+        };
+    };
+
+    const timelineConfig1: Timeline = {
             name: "timeline1",
             tweens: [
+                tweenFromStagger(".word1 .char", "first-tween"),
                 {
-                    name: "animation1",
-                    method: "from",
-                    targets: ".word1 .char",
-                    from: {
-                        y: "100%",
-                        duration: 0.5,
-                        stagger: 0.07,
-                        ease: "circ.out",
-                    },
-                },
-                {
-                    name: "animation2",
-                    method: "from",
+                    name: "second-word",
                     targets: ".word2 .char",
                     from: {
                         x: "-100%",
@@ -65,20 +74,18 @@
                 },
                 {
                     name: "dot",
-                    method: "from",
                     targets: ".tl-dot",
                     from: {
                         opacity: 0,
-                        repeat:10,
-                        duration:0.1,
-                        yoyo:true,
-                        repeatDelay:0.05,
+                        repeat: 10,
+                        duration: 0.1,
+                        yoyo: true,
+                        repeatDelay: 0.05,
                     },
                     position: "<",
                 },
                 {
                     name: "line-start",
-                    method: "from",
                     targets: ".tl-start",
                     from: {
                         height: 0,
@@ -86,8 +93,7 @@
                     position: "<",
                 },
                 {
-                    name: "line-main",
-                    method: "from",
+                    name: "line",
                     targets: ".tl-main",
                     from: {
                         width: 0,
@@ -95,8 +101,7 @@
                     position: "<+0.2",
                 },
                 {
-                    name: "animation3",
-                    method: "from",
+                    name: "third-word",
                     targets: ".word3 .char",
                     from: {
                         y: "-100%",
@@ -107,7 +112,6 @@
                     position: "-=.5s",
                 },
             ],
-        },
     };
 </script>
 
@@ -115,7 +119,7 @@
     <h1
         class="title"
         {@attach splitText(splitTextConfig)}
-        {@attach timeline(tweenConfig1)}
+        {@attach timeline(timelineConfig1)}
     >
         <span class="gsap">GSAP</span>
         <span class="timeline">
@@ -129,6 +133,13 @@
         <span class="basics">basics</span>
     </h1>
 </section>
+<h2
+    class="test"
+    {@attach splitText(splitTextConfig)}
+    {@attach tween([tweenFromStagger(".word1 .char","second-tween")])}
+>
+    test
+</h2>
 
 <style>
     .experiment {

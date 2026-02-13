@@ -215,7 +215,7 @@
         ease = "none",
         from: "center" | "start" | "end" | "edges" | "random" = "center";
 
-    const tweenRepeat = function (
+    const tweenRepeatCallback = function (
         this: gsap.core.Tween,
         param1: string,
         param2: string,
@@ -241,20 +241,28 @@
         unregisterAnimation,
     } = useGsap();
     const animations = $state(animationStore());
-     $effect(() => {
-        $inspect(animations);
-        if (animations["animation1"]) {
-            GSDevTools.create({
-                animation: animations["animation1"].animation,
-            });
-        }
+    $effect(() => {
+        //let id = null;
+        //if (animations["animation2"]) {
+        //    id = GSDevTools.create({
+        //        animation: animations["animation2"].animation,
+        //    });
+        //    console.log("gs", id);
+        //}
+        //return () => {
+        //    id?.kill();
+        //};
     });
 </script>
 
 <section class="experiment">
     <nav class="nav animation1">
-        <button class="btn" onclick={() => restart(animations["animation1"])}
-            >Restart</button
+        <button
+            class="btn"
+            onclick={() => {
+                restart(animations["animation1"]);
+                restart(animations["animation1-1"]);
+            }}>Restart</button
         >
         <button class="btn" onclick={() => pause(animations["animation1"])}
             >Pause</button
@@ -266,7 +274,6 @@
     <h1
         class="hero-text"
         {@attach splitText({
-            split: {
                 target: ".hero-text",
                 targetType: "chars",
                 vars: {
@@ -275,13 +282,11 @@
                     charsClass: "char",
                     mask: "chars",
                 },
-            },
         })}
-        {@attach tween({
-            tweens: [
+        {@attach tween(
+            [
                 {
-                    targets: ".char",
-                    method: "from",
+                    targets: ".word1 .char",
                     name: "animation1",
                     from: {
                         y: 50,
@@ -291,8 +296,21 @@
                         ease: "back.out(1.7)",
                     },
                 },
+                {
+                    targets: ".word2 .char",
+                    name: "animation1-1",
+                    from: {
+                        x: -150,
+                        y:-160,
+                        autoAlpha: 0,
+                        stagger: 0.2,
+                        duration: 0.2,
+                        ease: "back.out(1.7)",
+                        delay: 0.3,
+                    },
+                },
             ],
-        })}
+        )}
     >
         HELLO GSAP
     </h1>
@@ -322,10 +340,8 @@
     </nav>
     <h2
         class=""
-        {@attach tween({
-            tweens: [
+        {@attach tween([
                 {
-                    method: "fromTo",
                     name: "animation2",
                     from: {
                         y: 0,
@@ -345,12 +361,12 @@
                         yoyo: true,
                         repeat: -1,
                         paused: true,
-                        onRepeat: tweenRepeat,
+                        onRepeat: tweenRepeatCallback,
                         onRepeatParams: ["param1", "param2"],
                     },
                 },
             ],
-        })}
+        )}
     >
         Bouncy GSAP
     </h2>
@@ -384,10 +400,8 @@
     </nav>
     <div
         class="boxes"
-        {@attach tween({
-            tweens: [
+        {@attach tween([
                 {
-                    method: "to",
                     name: "animation3",
                     targets: ".box",
                     to: {
@@ -407,7 +421,7 @@
                     },
                 },
             ],
-        })}
+        )}
     >
         <div class="box">1</div>
         <div class="box">2</div>
@@ -425,6 +439,7 @@
         gap: 1rem;
     }
     .experiment {
+        padding-top: var(--header-height);
         padding-inline-start: 8rem;
         .nav {
             &:not(:first-of-type) {
