@@ -177,7 +177,6 @@ export const useGsap = () => {
         unregisterAnimation(name: string) {
             const entry = animations[name];
             if (!entry) return;
-
             const { animation } = entry;
 
             // if on start -> kill
