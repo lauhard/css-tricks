@@ -1,14 +1,109 @@
-import { SplitText } from "gsap/SplitText";
 import gsap from "gsap";
-import { GSDevTools } from "gsap/GSDevTools";
 import type { Attachment } from "svelte/attachments";
+import { SplitText } from "gsap/SplitText";
+import { GSDevTools } from "gsap/GSDevTools";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import DrawSVGPlugin from "gsap/DrawSVGPlugin";
+import { browser } from "$app/environment";
 
 /********************** GSAP PLUGINS ******************/
 
-gsap.registerPlugin(GSDevTools);
-gsap.registerPlugin(SplitText);
+let devTool = $state<GSDevTools | null | undefined>();
+if (browser) {
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(DrawSVGPlugin);
+    gsap.registerPlugin(SplitText);
+}
+export type Tween = {
+    name?: string,
+    targets?: gsap.TweenTarget;
+    from?: gsap.TweenVars;
+    to?: gsap.TweenVars;
+    position?: gsap.Position;
+}
+export type Timeline = {
+    name?: string;
+    vars?: gsap.TimelineVars;
+    tweens: Tween[];
+}
+export type Split = {
+    target?: string;
+    vars: SplitText.Vars;
+}
+export type Animation = {
+    id: string;
+    tween?: gsap.core.Tween;
+    timeline?: gsap.core.Timeline;
+    name?: string;
+};
+export type AnimationStore = {
+    animation: Record<string, Animation>;
+};
 
-export { gsap, GSDevTools };
+
+
+//iterate over tweens
+const tweenIterate = (tweens: Tween[] | undefined, element: Element | Element[], animations: AnimationStore) => {
+    if (!tweens) return;
+    for (const tween of tweens || []) {
+        const target = tween.targets
+            ? (tween.targets as Element | Element[])
+            : element;
+        let animation = gsapTween(target, tween) as ReturnType<
+            typeof gsapTween
+        >;
+        // register animatiton
+        let id = crypto.randomUUID();
+        let index = id.toString();
+        if (tween.name)
+            index = tween.name;
+
+        if (animation)
+            animations.animation[index] = {
+                id: id,
+                name: tween.name,
+                tween: animation,
+            };
+    }
+}
+
+// timeline iterate
+const timelineIterate = (tl: gsap.core.Timeline, tweens: Tween[] | undefined, element: Element | Element[], animations: AnimationStore) => {
+    if (!tweens) return;
+    for (const tween of tweens || []) {
+        const target = tween.targets
+            ? (tween.targets as Element | Element[])
+            : element;
+        let timeline = gsapTimeline(tl, target, tween) as ReturnType<
+            typeof gsapTimeline
+        >;
+        // register animatiton
+        let id = crypto.randomUUID();
+        let index = id.toString();
+        if (tween.name)
+            index = tween.name;
+
+        if (timeline)
+            animations.animation[index] = {
+                id: id,
+                name: tween.name,
+                timeline: timeline,
+            };
+    }
+}
+
+//animation cleanup
+const animationCleanup = (animations: AnimationStore) => {
+    Object.entries(animations.animation).forEach(([index, entry]) => {
+        const target = entry.timeline ?? entry.tween;
+        target?.revert();
+        target?.kill();
+        console.log(
+            "animation cleanup", animations.animation?.[index]?.name || index
+        );
+        delete animations.animation?.[index];
+    })
+}
 
 export const gsapTween = (
     element?: Node | Element[] | Element | HTMLElement,
@@ -31,6 +126,7 @@ export const gsapTween = (
         return null;
     }
 };
+
 export const gsapTimeline = (
     tl: gsap.core.Timeline,
     element?: Node | Element[] | Element | HTMLElement,
@@ -54,152 +150,88 @@ export const gsapTimeline = (
     }
 };
 
-
-export type Tween = {
-    name?: string,
-    targets?: gsap.TweenTarget;
-    from?: gsap.TweenVars;
-    to?: gsap.TweenVars;
-    position?: gsap.Position;
+export const startDevTools = (config: GSDevTools.Vars) => {
+    gsap.registerPlugin(GSDevTools);
+    devTool = null;
+    devTool = GSDevTools.create({
+        ...config,
+    });
+    console.log("gsap DevTools started", devTool);
+    return devTool;
 }
-export type Timeline = {
-    name?: string;
-    vars?: gsap.TimelineVars;
-    tweens: Tween[];
-}
-
-export type Split = {
-    target?: string;
-    vars: SplitText.Vars;
-    targetType: "chars" | "words";
-}
-
-export type GsapOptions = {
-    // method?: "from" | "to" | "fromTo" | "timeline";
-    tweens?: Tween[],
-    timeline?: Timeline,
-    split?: Split;
-};
-
-export type AnimationStore = {
-    id: string;
-    animation?: any;
-    timeline?: any;
-    name?: string;
-};
-
-export type TimlineStore = {
-    id: string;
-    timeline: any;
-    name?: string;
-};
-
-//iterate over tweens
-const tweenIterate = (tweens: Tween[] | undefined, element: Element | Element[], animations: Record<string, AnimationStore>) => {
-    if (!tweens) return;
-    for (const tween of tweens || []) {
-        if (tween?.targets) {
-            element = tween.targets as Element | Element[];
-        }
-        let animation = gsapTween(element, tween) as ReturnType<
-            typeof gsapTween
-        >;
-        // register animatiton
-        let id = crypto.randomUUID();
-        let index = id.toString();
-        if (tween.name)
-            index = tween.name;
-       
-        animations[index] = {
-            id: id, //not needed...
-            name: tween.name,
-            animation: animation,
-        };
+export const killDevTools = () => {
+    if (devTool) {
+        devTool.kill();
+        devTool = null;
+        console.log("gsap DevTools killed");
     }
 }
 
-// timeline iterate
-const timelineIterate = (tl: gsap.core.Timeline, tweens: Tween[] | undefined, element: Element | Element[], animations: Record<string, AnimationStore>) => {
-    if (!tweens) return;
-    for (const tween of tweens || []) {
-        if (tween?.targets) {
-            element = tween.targets as Element | Element[];
-
-        }
-        let timeline = gsapTimeline(tl, element, tween) as ReturnType<
-            typeof gsapTimeline
-        >;
-        // register animatiton
-        let id = crypto.randomUUID();
-        let index = id.toString();
-        if (tween.name)
-            index = tween.name;
-       
-        animations[index] = {
-            id: id, //not needed...
-            name: tween.name,
-            timeline: timeline,
-        };
-    }
+export const killScrollTrigger = () => {
+    ScrollTrigger.getAll().forEach((st) => {
+        st.kill();
+    });
+    console.log("ScrollTriggers killed");
 }
 
-//animation cleanup
-const animationCleanup = (animations: Record<string, AnimationStore>) => {
-    Object.entries(animations).forEach(([index, tween]) => {
-        animations[index]?.animation?.revert();
-        animations[index]?.animation?.kill();
-        console.log(
-            "animation cleanup",animations?.[index]?.name || index
-        );
-        delete animations?.[index];
-    })
-}
-
-//timeline cleanup
-const timelineCleanup = (animations: Record<string, AnimationStore>) => {
-    Object.entries(animations).forEach(([index, timeline]) => {
-        animations[index]?.timeline?.revert();
-        animations[index]?.timeline?.kill();
-        console.log(
-            "timeline cleanup",animations?.[index]?.name || index
-        );
-        delete animations?.[index];
-    })
-}
 
 export const useGsap = () => {
-    let animations = $state<Record<string, AnimationStore>>({});
+    let animations = $state<AnimationStore>({ animation: {} });
+    let devTool = $state<GSDevTools | null>(null);
+    $effect(() => {
+        return () => {
+            killScrollTrigger();
+        };
+    })
     return {
         animationStore() {
             return animations;
         },
-
-        unregisterAnimation(name: string) {
-            const entry = animations[name];
+        getAnimation(name: string) {
+            return animations.animation[name];
+        },
+        unregisterAnimation(name: string, config?: { atTime: number | string, suppressEvents?: boolean }) {
+            const entry = animations.animation[name];
             if (!entry) return;
-            const { animation } = entry;
 
-            // if on start -> kill
-            if (animation.time() === 0) {
-                animation.kill();
-                delete animations[name];
+            const target = entry.tween ?? entry.timeline;
+            if (!target) return;
+
+            if (target.time() === 0) {
+                target.kill();
+                delete animations.animation[name];
                 return;
             }
 
             // Clear any previous reverse-complete callback to avoid stacking
-            animation.eventCallback("onReverseComplete", null);
+            target.eventCallback("onReverseComplete", null);
 
             // wait for revert animation to be finished
-            animation.eventCallback("onReverseComplete", () => {
-                animation.kill();
-                delete animations[name];
+            target.eventCallback("onReverseComplete", () => {
+                target.kill();
+                delete animations.animation[name];
                 console.log("onReverseComplete", "completed");
             });
 
-            animation.reverse(2, false);
+            target.reverse(config?.atTime, config?.suppressEvents);
+        },
+        startDevTools(config: GSDevTools.Vars) {
+            gsap.registerPlugin(GSDevTools);
+            devTool = null;
+            devTool = GSDevTools.create({
+                ...config,
+            });
+        },
+        killDevTools() {
+            if (devTool) {
+                devTool.kill();
+                devTool = null;
+                console.log("gsap DevTools killed");
+            }
         },
         splitText(splitOptions: Split): Attachment {
             return (element: Element) => {
+                if (!browser) return;
                 //write a fuction that splits classes and ignores classes that starts with "s-"
                 const classes = element.className.split(" ").filter((c) => !c.startsWith("s-"));
                 if (!splitOptions.target && classes.length === 0) return;
@@ -218,19 +250,20 @@ export const useGsap = () => {
                 }
             }
         },
-        tween(tweenOptions: Tween[], ctx = true): Attachment {
+        tween(tweenOptions: Tween[], scoped = true): Attachment {
             return (element: Element | Element[]) => {
+                if (!browser) return;
                 if (!tweenOptions) return;
                 if (tweenOptions.length === 0) return;
                 let context: gsap.Context | null = null;
-                if (ctx) {
+                if (scoped) {
                     context = gsap.context(() => {
                         tweenIterate(tweenOptions, element, animations);
                     }, element);
                 } else {
                     tweenIterate(tweenOptions, element, animations);
                 }
-                console.log("context tween", ctx);
+                console.log("context tween", context);
                 return () => {
                     if (context) {
                         context.revert();
@@ -241,14 +274,15 @@ export const useGsap = () => {
                 };
             };
         },
-        timeline(timelineOptions: Timeline, ctx = true): Attachment {
+        timeline(timelineOptions: Timeline, scoped = true): Attachment {
             return (element: Element | Element[]) => {
+                if (!browser) return;
                 if (!timelineOptions || !timelineOptions?.tweens) return;
-                if (timelineOptions?.tweens.length === 0) return;
-                const timelineVars = timelineOptions?.vars || {};
+                //if (timelineOptions?.tweens.length === 0) return;
+                const timelineVars = timelineOptions?.vars || undefined;
                 const tl = gsap.timeline(timelineVars);
                 let context: gsap.Context | null = null;
-                if (ctx) {
+                if (scoped) {
                     context = gsap.context(() => {
                         timelineIterate(tl, timelineOptions.tweens, element, animations);
                     }, element);
@@ -256,44 +290,48 @@ export const useGsap = () => {
                     timelineIterate(tl, timelineOptions.tweens, element, animations);
                 }
                 let id = crypto.randomUUID();
-                let index = id.toString();  
+                let index = id.toString();
                 if (timelineOptions?.name) {
                     index = timelineOptions.name;
-                    animations[index] = {
+                    animations.animation[index] = {
                         id: id,
                         name: timelineOptions.name,
                         timeline: tl,
                     }
                 }
-                console.log("context timeline"+(timelineOptions?.name || index), ctx);
+                console.log("context timeline " + (timelineOptions?.name || index), context);
                 return () => {
-                    if (context) {
-                        context.revert();
-                        context.clear();
-                        context.kill();
-                    }
-                    tl.reverse();
-                    tl.autoRemoveChildren = true;
                     tl.eventCallback("onReverseComplete", () => {
                         console.log("timeline onReverseComplete", "completed");
-                        tl.clear();
+                        animationCleanup(animations);
+                        tl.clear(true);
                         tl.kill();
+                        if (context) {
+                            context.revert();
+                            context.clear();
+                            context.kill();
+                        }
                     });
-                    //timelineCleanup(animations);
+                    tl.reverse();
+                    tl.autoRemoveChildren = true;
                 };
             };
         },
 
         //calll specific animation
-        restart(entry: AnimationStore) {
-            if (entry) entry.animation?.restart(true, false);
+        restart(entry: Animation) {
+            const target = entry?.tween ?? entry?.timeline;
+            target?.restart(true, false);
         },
-        play(entry: AnimationStore) {
-            if (entry) entry.animation?.play();
+        play(entry: Animation) {
+            const target = entry?.tween ?? entry?.timeline;
+            target?.play();
         },
-        pause(entry: AnimationStore) {
-            if (entry) entry.animation?.pause();
-        },
+        pause(entry: Animation) {
+            const target = entry?.tween ?? entry?.timeline;
+            target?.pause();
+        }
+
     };
 };
 

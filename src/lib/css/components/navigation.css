@@ -7,7 +7,6 @@
     max-height: var(--header-height);
     height: var(--header-height);
     background-color: var(--color-ld-white-300);
-
     ul {
         height: 100%;
         display: flex;

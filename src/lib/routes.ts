@@ -11,6 +11,10 @@ export const routes = [
     {
         path: '/experiment3',
         name: 'Experiment 3'
+    },
+    {
+        path: '/experiment4',
+        name: 'Experiment 4'
     }
 ];
 export interface Route {

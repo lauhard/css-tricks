@@ -1,40 +1,25 @@
 <script lang="ts">
     import {
         useGsap,
-        type GsapOptions,
-        GSDevTools,
         type Tween,
         type Split,
         type Timeline,
     } from "$lib/gsap.svelte";
-    let {
-        splitText,
-        tween,
-        timeline,
-        play,
-        pause,
-        restart,
-        animationStore,
-        unregisterAnimation,
-    } = useGsap();
+    let { splitText, tween, timeline, getAnimation, startDevTools, killDevTools } = useGsap();
 
-    let animations = $derived(animationStore());
 
     $effect(() => {
-        let id = null;
-        if (animations["first-tween"]) {
-            id = GSDevTools.create({
-                animation: animations["first-tween"].timeline,
-            });
-            console.log("gs", id);
-        }
+        let devConfig: GSDevTools.Vars = {
+            animation: getAnimation("timeline1")?.timeline,
+            id: getAnimation("timeline1")?.id,
+        };
+        startDevTools(devConfig);
         return () => {
-            id?.kill();
+            killDevTools();
         };
     });
 
     const splitTextConfig: Split = {
-        targetType: "chars",
         vars: {
             type: "words, chars",
             wordsClass: "word++",
@@ -58,60 +43,60 @@
     };
 
     const timelineConfig1: Timeline = {
-            name: "timeline1",
-            tweens: [
-                tweenFromStagger(".word1 .char", "first-tween"),
-                {
-                    name: "second-word",
-                    targets: ".word2 .char",
-                    from: {
-                        x: "-100%",
-                        duration: 0.2,
-                        stagger: 0.07,
-                        ease: "circ.out",
-                    },
-                    position: "-=.5s",
+        name: "timeline1",
+        tweens: [
+            tweenFromStagger(".word1 .char", "first-tween"),
+            {
+                name: "second-word",
+                targets: ".word2 .char",
+                from: {
+                    x: "-100%",
+                    duration: 0.2,
+                    stagger: 0.07,
+                    ease: "circ.out",
                 },
-                {
-                    name: "dot",
-                    targets: ".tl-dot",
-                    from: {
-                        opacity: 0,
-                        repeat: 10,
-                        duration: 0.1,
-                        yoyo: true,
-                        repeatDelay: 0.05,
-                    },
-                    position: "<",
+                position: "-=.5s",
+            },
+            {
+                name: "dot",
+                targets: ".tl-dot",
+                from: {
+                    opacity: 0,
+                    repeat: 10,
+                    duration: 0.1,
+                    yoyo: true,
+                    repeatDelay: 0.05,
                 },
-                {
-                    name: "line-start",
-                    targets: ".tl-start",
-                    from: {
-                        height: 0,
-                    },
-                    position: "<",
+                position: "<",
+            },
+            {
+                name: "line-start",
+                targets: ".tl-start",
+                from: {
+                    height: 0,
                 },
-                {
-                    name: "line",
-                    targets: ".tl-main",
-                    from: {
-                        width: 0,
-                    },
-                    position: "<+0.2",
+                position: "<",
+            },
+            {
+                name: "line",
+                targets: ".tl-main",
+                from: {
+                    width: 0,
                 },
-                {
-                    name: "third-word",
-                    targets: ".word3 .char",
-                    from: {
-                        y: "-100%",
-                        duration: 0.3,
-                        stagger: 0.07,
-                        ease: "circ.out",
-                    },
-                    position: "-=.5s",
+                position: "<+0.2",
+            },
+            {
+                name: "third-word",
+                targets: ".word3 .char",
+                from: {
+                    y: "-100%",
+                    duration: 0.3,
+                    stagger: 0.07,
+                    ease: "circ.out",
                 },
-            ],
+                position: "-=.5s",
+            },
+        ],
     };
 </script>
 
@@ -136,7 +121,7 @@
 <h2
     class="test"
     {@attach splitText(splitTextConfig)}
-    {@attach tween([tweenFromStagger(".word1 .char","second-tween")])}
+    {@attach tween([tweenFromStagger(".word1 .char", "second-tween")])}
 >
     test
 </h2>
@@ -161,6 +146,8 @@
             text-align: left;
             text-transform: uppercase;
             position: relative;
+            width: fit-content;
+            min-width: fit-content;
             .gsap {
                 position: relative;
                 display: block;
@@ -170,10 +157,13 @@
             .timeline {
                 position: relaitve;
                 display: block;
+                min-width: fit-content;
+                max-width: fit-content;
+                width: inherit;
             }
             .tl-wrapper {
                 position: relative;
-                min-width: max-content;
+                min-width: inherit;
                 height: 0.04em;
                 .tl-main {
                     position: absolute;
